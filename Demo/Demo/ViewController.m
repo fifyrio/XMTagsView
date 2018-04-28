@@ -7,21 +7,16 @@
 //
 
 #import "ViewController.h"
-#import "AFGridTagsView.h"
-#import <Masonry.h>
 #import "AFTableViewCell.h"
-
-#define ScreenH [UIScreen mainScreen].bounds.size.height
-#define ScreenW [UIScreen mainScreen].bounds.size.width
-#define WS(weakSelf)  __weak __typeof(&*self)weakSelf = self;
 
 static NSString * const kAFTableViewCell = @"AFTableViewCell";
 
 @interface ViewController ()<UITableViewDataSource, UITableViewDelegate>
 
-@property (nonatomic, strong) AFGridTagsView *tagsView;
-
 @property (nonatomic, strong) UITableView *tableView;
+
+@property (weak, nonatomic) IBOutlet UIButton *btn;
+@property (nonatomic, retain) NSMutableArray *dataArray;
 
 @end
 
@@ -32,64 +27,48 @@ static NSString * const kAFTableViewCell = @"AFTableViewCell";
     self.automaticallyAdjustsScrollViewInsets = NO;
     self.title = @"Demo";
     
+    self.dataArray = @[].mutableCopy;
     [self setUpViews];
     
 }
 #pragma mark - Initialize
 - (void)setUpViews{
-    [self.view addSubview:self.tagsView];
-    [self.view setNeedsUpdateConstraints];
-    [self.view updateConstraintsIfNeeded];
-}
-
-- (void)updateViewConstraints{
-    WS(weakSelf);
-    [self.tagsView mas_remakeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(self.view).offset(100);
-        make.left.right.equalTo(self.view);
-        make.height.equalTo(@(weakSelf.tagsView.autoGridTagsViewHeight));
+    [self.view insertSubview:self.tableView belowSubview:self.btn];
+    
+    [self.tableView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(self.view).offset(64);
+        make.left.right.bottom.equalTo(self.view);
     }];
-    [super updateViewConstraints];
-}
-
-- (AFGridTagsView *)tagsView{
-    if (!_tagsView) {
-        AFGridTagsViewLayout *layout = [AFGridTagsViewLayout new];
-        layout.itemSize = CGSizeMake(0, 14);
-        layout.interitemSpacing = 10;
-        layout.lineSpacing = 5;
-        layout.sectionInset = UIEdgeInsetsMake(0, 20, 0, 20);
-        layout.gridViewWidth = ScreenW;
-        
-        AFGridTagAppearance *appearance = [AFGridTagAppearance new];
-        appearance.tagTextColor = [UIColor blueColor];
-        appearance.tagFont = [UIFont systemFontOfSize:12];
-        appearance.tagBackgroundColor = [UIColor grayColor];
-        
-        _tagsView = [[AFGridTagsView alloc] initWithFrame:CGRectZero layout:layout tagAppearance:appearance];
-        _tagsView.autoAdjustHeight = YES;
-    }
-    return _tagsView;
 }
 
 #pragma mark -
 - (IBAction)onclickRun:(id)sender {
+    
+    NSArray *array = @[@"B2户型", @"B2户型", @"B2户型", @"B2户型", @"B2户型", @"B2户型", @"B2户型", @"B2户型", @"B2户型", @"B2户型", @"B2户型", @"B2户型"];
+    [self.dataArray addObjectsFromArray:array];
+    [self.tableView reloadData];
+    /*
     NSArray *array = @[@"B2户型", @"B2户型", @"B2户型", @"B2户型", @"B2户型", @"B2户型", @"B2户型", @"B2户型", @"B2户型", @"B2户型", @"B2户型", @"B2户型"];
     [self.tagsView setupWithTitles:array];
+     */
 }
 
 #pragma mark - UITableViewDataSource
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    return 10;
+    return self.dataArray.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     AFTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:kAFTableViewCell];
+    if (cell == nil) {
+        cell = [[AFTableViewCell alloc] initWithStyle:UITableViewCellStyleValue2 reuseIdentifier:kAFTableViewCell];
+    }
+    cell.dataArray = self.dataArray.copy;
     return cell;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
-    return 30;
+    return 100;
 }
 
 #pragma mark -

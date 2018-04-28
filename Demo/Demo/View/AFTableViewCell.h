@@ -10,4 +10,6 @@
 
 @interface AFTableViewCell : UITableViewCell
 
+@property (nonatomic, copy) NSArray *dataArray;
+
 @end
